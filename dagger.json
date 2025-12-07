@@ -1,0 +1,20 @@
+{
+  "name": "dagger",
+  "engineVersion": "v0.19.7",
+  "sdk": {
+    "source": "typescript"
+  },
+  "dependencies": [
+    {
+      "name": "secret-manager",
+      "source": "github.com/Dudesons/daggerverse/secret-manager@main",
+      "pin": "9348808c60af026c9ad036e9c8ce37da962dc979"
+    },
+    {
+      "name": "terraform",
+      "source": "github.com/Excoriate/daggerverse/terraform@v1.12.0",
+      "pin": "42848834710d3286621b7e289424c2a0173dbc46"
+    }
+  ],
+  "source": ".dagger"
+}
