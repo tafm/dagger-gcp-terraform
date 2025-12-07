@@ -18,22 +18,21 @@ export class Dagger {
   @func()
   async apply(
     dir: Directory,
+    terraformDir: string,
     credentialsFile: File,
     socket: Socket,
     varsSecret: Secret,
     stateBucket: string
   ): Promise<string> {
-    // const varsParam = await this.downloadSecret(dir, credentialsFile)
-
     // 1. Define the base Terraform container image
     const terraform: Container = dag
       .container()
       .from("hashicorp/terraform:1.6.4") // Use a stable, specific version
       .withEnvVariable("GOOGLE_APPLICATION_CREDENTIALS", "sa.json")
       .withMountedDirectory("/src", dir)
-      .withMountedFile("/src/devops/terraform/sa.json", credentialsFile)
-      .withMountedSecret("/src/devops/terraform/vars.tfvars", varsSecret)
-      .withWorkdir("/src/devops/terraform")
+      .withMountedFile(`/src/${terraformDir}/sa.json`, credentialsFile)
+      .withMountedSecret(`/src/${terraformDir}/vars.tfvars`, varsSecret)
+      .withWorkdir(`/src/${terraformDir}`)
       .withUnixSocket("/var/run/docker.sock", socket);
 
     // 2. Initialize Terraform
@@ -53,9 +52,9 @@ export class Dagger {
   }
 
   @func()
-  async deploy(terraformDir: Directory, credentialsFile: File, socket: Socket, varsSecretName: string, projectName: string, stateBucket: string) {
+  async deploy(rootDir: Directory, terraformDir: string = 'devops/terraform', credentialsFile: File, socket: Socket, varsSecretName: string, projectName: string, stateBucket: string) {
     const varsSecret = await this.downloadSecret(varsSecretName, credentialsFile, projectName)
-    const out = this.apply(terraformDir, credentialsFile, socket, varsSecret, stateBucket)
+    const out = this.apply(rootDir, terraformDir, credentialsFile, socket, varsSecret, stateBucket)
 
     return out;
   }
