@@ -10,16 +10,16 @@ After writing again and again yaml pipelines close to the same just to apply my 
 
 The module at its own folder is a very simple typescript dagger module that can download a .tfvars file from GCP secret manager and deploy the terraform infrastructure.
 
-This module assumes that you terraform module will be at
+This module assumes that your terraform module will be at
 "devops/terraform" folder. To use a custom directory use the --terraform-dir parameter with a value in replace of the default "devops/terraform"
 
 ### Image
 
-The idea with the image is to give in a easier way a dagger distribution compatible with this module and with the module itself embedded at the image.
+The idea with the image is to provide a dagger distribution compatible with this module and with the module itself embedded at the image.
 
 ### Security concerns
 
-Because that module manages very sensitive data in production enviroments i trully recommended that you build you own image from that Dockerfile instead using my pre-builded image, but fell free to use for testing.
+Because that module manages very sensitive data in production enviroments, i trully recommended that you should build your own image from that Dockerfile instead using my pre-builded image, but fell free to use for testing.
 
 ## Running locally
 
@@ -27,7 +27,7 @@ Because that module manages very sensitive data in production enviroments i trul
 
 Clone this repository at some CUSTOM-FOLDER
 
-```bash
+```console
 dagger call \
 -m CUSTOM-FOLDER/module deploy \
 --root-dir YOUR-CODE-REPOSITORY-FOLDER \
@@ -42,7 +42,7 @@ dagger call \
 
 ### With a pre-builded image
 
-```bash
+```console
 docker run --rm \
 --entrypoint dagger \
 --workdir /src \
