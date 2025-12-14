@@ -52,11 +52,11 @@ export class Dagger {
   }
 
   @func()
-  async deploy(rootDir: Directory, terraformDir: string = 'devops/terraform', credentialsFile: File, socket: Socket, varsSecretName: string, varsSecretFile: Secret | null = null, projectName: string, stateBucket: string) {
+  async deploy(rootDir: Directory, terraformDir: string = 'devops/terraform', credentialsFile: File, socket: Socket, varsSecretName: string | null = null, varsSecretFile: Secret | null = null, projectName: string, stateBucket: string) {
     let varsSecret = varsSecretFile;
 
     if (varsSecret == null) {
-      varsSecret = await this.downloadSecret(varsSecretName, credentialsFile, projectName)
+      varsSecret = await this.downloadSecret(varsSecretName!, credentialsFile, projectName)
     }
 
     const out = this.apply(rootDir, terraformDir, credentialsFile, socket, varsSecret, stateBucket)

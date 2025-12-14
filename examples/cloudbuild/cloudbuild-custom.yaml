@@ -1,0 +1,48 @@
+# This cloudbuild file uses a custom deployer module
+
+# Step 1 - Downloads the service account key that will be used to deploy the terraform modules,
+# you can replace the SERVICE_ACCOUNT_DEPLOYER_KEY with the name of that secret. Alternativelly you can full replace that first step
+# and replace the "/workspace/credentials.json" at step 2 with the path of your service account file
+
+# Step 2 - Downloads the GCP secret (replace TERRAFORM-VARS-SECRET with your secret name) containing the terraform vars values,
+# also replace the GCP-PROJECT-ID with your project ID, and GCP-TERRAFORM-STATE-BUCKET with your state bucket name
+# if have another source that GCP secrets for the .tfvars file replace the --vars-secret-name and value for --vars-secret-file= ./pathto/vars.tfvars
+
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Fetch SA Key'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Fetch the secret content from Secret Manager and write it to a file
+      gcloud secrets versions access latest --secret=SERVICE_ACCOUNT_DEPLOYER_KEY > /workspace/credentials.json
+- name: 'gcr.io/cloud-builders/git'
+  args:
+  - 'clone'
+  - 'https://github.com/tafm/dagger-gcp-terraform.git' # Replace with your custom deployer module
+  - 'devops/dagger'
+- name: 'thomasandersonn/dagger-gcp-terraform:v0.19.8-build-2'
+  id: 'Run Dagger Pipeline'
+  entrypoint: 'dagger'
+  args:
+    - 'call'
+    - '-m'
+    - './devops/dagger/module/.dagger'
+    - 'deploy'
+    - '--root-dir'
+    - '.'
+    - '--credentials-file'
+    - '/workspace/credentials.json'
+    - '--socket'
+    - 'unix:///var/run/docker.sock'
+    - '--vars-secret-name'
+    - 'TERRAFORM-VARS-SECRET'
+    - '--project-name'
+    - 'GCP-PROJECT-ID'
+    - '--state-bucket'
+    - 'GCP-TERRAFORM-STATE-BUCKET'
+    - '--progress=plain'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
