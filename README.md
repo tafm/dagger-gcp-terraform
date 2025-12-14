@@ -42,4 +42,20 @@ dagger call \
 
 ### With a pre-builded image
 
-in progress...
+```bash
+docker run --rm \
+--entrypoint dagger \
+--workdir /src \
+-v CODE-ROOT-DIRECTORY:/src \
+-v SERVICE-ACCOUNT-KEY-FILE:/src/devops/terraform/sa.json \
+-v VARS-FILE:/src/devops/terraform/vars.tfvars \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-it thomasandersonn/dagger-gcp-terraform:v0.19.8-build-4 call \
+-m /terraformdagger/module/.dagger deploy \
+--root-dir /src \
+--credentials-file /src/devops/terraform/sa.json \
+--socket unix:///var/run/docker.sock \
+--project-name GCP-PROJECT-NAME \
+--state-bucket=GCP-STATE-BUCKET \
+--vars-secret-file=file:///src/devops/terraform/vars.tfvars
+```
